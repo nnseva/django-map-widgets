@@ -127,6 +127,65 @@ class BaseLineStringFieldInteractiveWidget(SettingsMixin, forms.BaseGeometryWidg
         return context
 
 
+class BasePolygonFieldInteractiveWidget(SettingsMixin, forms.BaseGeometryWidget):
+    _settings = None
+    map_srid = mw_settings.srid
+
+    def get_css_paths(self, extra_css=None, minified=False):
+        extra_css = extra_css or []
+        media_settings = self.settings.media
+        return extra_css + (
+            media_settings.css.minified if minified else media_settings.css.dev
+        )
+
+    def get_js_paths(self, extra_js=None, minified=False):
+        extra_js = extra_js or []
+        media_settings = self.settings.media
+        return extra_js + (
+            media_settings.js.minified if minified else media_settings.js.dev
+        )
+
+    def _media(self, extra_css=None, extra_js=None):
+        css_paths = self.get_css_paths(extra_css, minified=not mw_settings.is_dev_mode)
+        js_paths = self.get_js_paths(extra_js, minified=not mw_settings.is_dev_mode)
+        return forms.Media(css={"all": css_paths}, js=js_paths)
+
+    @property
+    def media(self):
+        return self._media()
+
+    def geos_to_dict(self, geom: GEOSGeometry):
+        if geom is None:
+            return None
+
+        geom_dict = {
+            "srid": geom.srid,
+            "wkt": str(geom),
+            "coords": geom.coords,
+            "geom_type": geom.geom_type,
+        }
+        try:
+            geom_dict["geojson"] = json.loads(geom.geojson)
+        except Exception:
+            geom_dict["geojson"] = None
+        return geom_dict
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        field_value = context["serialized"]
+        if field_value:
+            field_value = self.geos_to_dict(self.deserialize(field_value))
+        else:
+            field_value = None
+
+        extra_context = {
+            "options": json.dumps(self.settings),
+            "field_value": json.dumps(field_value),
+        }
+        context.update(extra_context)
+        return context
+
+
 class BaseStaticWidget(SettingsMixin, forms.TextInput):
     template_name = "mapwidgets/static_widget.html"
     _base_url = None

@@ -27,3 +27,11 @@ class InteractiveLineStringFieldAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.LineStringField: {"widget": mapwidgets.MapboxLineStringFieldWidget}
     }
+
+
+@admin.register(mapbox_models.InteractivePolygonField)
+class InteractivePolygonFieldAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+    formfield_overrides = {
+        models.PolygonField: {"widget": mapwidgets.MapboxPolygonFieldWidget}
+    }

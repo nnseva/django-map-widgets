@@ -60,6 +60,14 @@ def minify_js_files():
             "dev_js_paths": mw_settings.Mapbox.PointField.interactive.media.js.dev,
             "minified_js_path": mw_settings.Mapbox.PointField.interactive.media.js.minified,
         },
+        "MapboxLineStringFieldWidget": {
+            "dev_js_paths": mw_settings.Mapbox.LineStringField.interactive.media.js.dev,
+            "minified_js_path": mw_settings.Mapbox.LineStringField.interactive.media.js.minified,
+        },
+        "MapboxPolygonFieldWidget": {
+            "dev_js_paths": mw_settings.Mapbox.PolygonField.interactive.media.js.dev,
+            "minified_js_path": mw_settings.Mapbox.PolygonField.interactive.media.js.minified,
+        },
         "LeafletPointFieldWidget": {
             "dev_js_paths": mw_settings.Leaflet.PointField.interactive.media.js.dev,
             "minified_js_path": mw_settings.Leaflet.PointField.interactive.media.js.minified,

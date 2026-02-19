@@ -1,5 +1,5 @@
 from django.contrib.gis.db import models
-from django.contrib.gis.geos import LineString, Point
+from django.contrib.gis.geos import LineString, Point, Polygon
 from django.urls import reverse
 
 from demo.db import BaseModel
@@ -9,6 +9,17 @@ DEFAULT_LOCATION_LINE = LineString(
     (-104.9903, 39.7392),
     (-104.9803, 39.7492),
     (-104.9703, 39.7592),
+    srid=4326,
+)
+
+DEFAULT_LOCATION_POLYGON = Polygon(
+    (
+        (-104.9903, 39.7392),
+        (-104.9803, 39.7392),
+        (-104.9803, 39.7492),
+        (-104.9903, 39.7492),
+        (-104.9903, 39.7392),
+    ),
     srid=4326,
 )
 
@@ -58,3 +69,23 @@ class InteractiveLineStringField(BaseModel):
 
     def get_absolute_url(self):
         return reverse("mapbox:linestringfield_interactive_edit", args=(self.id,))
+
+
+class InteractivePolygonField(BaseModel):
+    name = models.CharField(max_length=255)
+    area = models.PolygonField(
+        help_text="Use map widget to draw the polygon",
+        srid=4326,
+    )
+    area_has_default = models.PolygonField(default=DEFAULT_LOCATION_POLYGON, srid=4326)
+    area_optional = models.PolygonField(blank=True, null=True, srid=4326)
+
+    class Meta:
+        verbose_name = "Interactive PolygonField Widget"
+        verbose_name_plural = "Interactive PolygonField Widget"
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("mapbox:polygonfield_interactive_edit", args=(self.id,))

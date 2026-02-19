@@ -3,9 +3,15 @@ from django.views.generic import FormView, ListView, UpdateView
 from mapbox.forms import (
     InteractiveLineStringFieldViewForm,
     InteractivePointFieldViewForm,
+    InteractivePolygonFieldViewForm,
     StaticPointFieldViewForm,
 )
-from mapbox.models import InteractiveLineStringField, InteractivePointField, StaticPointField
+from mapbox.models import (
+    InteractiveLineStringField,
+    InteractivePointField,
+    InteractivePolygonField,
+    StaticPointField,
+)
 
 
 class InteractivePointFieldListView(ListView):
@@ -68,3 +74,27 @@ class InteractiveLineStringFieldAddView(FormView):
     def form_valid(self, form):
         form.save()
         return super(InteractiveLineStringFieldAddView, self).form_valid(form)
+
+
+class InteractivePolygonFieldListView(ListView):
+    queryset = InteractivePolygonField.objects.all().order_by("-updated_at")
+    template_name = "mapbox/polygonfield/interactive/list.html"
+    context_object_name = "polygonfield_objs"
+
+
+class InteractivePolygonFieldEditView(UpdateView):
+    form_class = InteractivePolygonFieldViewForm
+    model = InteractivePolygonField
+    template_name = "mapbox/polygonfield/interactive/edit.html"
+    context_object_name = "obj"
+    success_url = reverse_lazy("mapbox:polygonfield_interactive_list")
+
+
+class InteractivePolygonFieldAddView(FormView):
+    template_name = "mapbox/polygonfield/interactive/add.html"
+    form_class = InteractivePolygonFieldViewForm
+    success_url = reverse_lazy("mapbox:polygonfield_interactive_list")
+
+    def form_valid(self, form):
+        form.save()
+        return super(InteractivePolygonFieldAddView, self).form_valid(form)

@@ -1,8 +1,14 @@
 from django import forms
-from mapbox.models import InteractiveLineStringField, InteractivePointField, StaticPointField
+from mapbox.models import (
+    InteractiveLineStringField,
+    InteractivePointField,
+    InteractivePolygonField,
+    StaticPointField,
+)
 
 from mapwidgets import (
     MapboxLineStringFieldWidget,
+    MapboxPolygonFieldWidget,
     MapboxPointFieldStaticWidget,
     MapboxPointFieldWidget,
 )
@@ -35,4 +41,13 @@ class InteractiveLineStringFieldViewForm(forms.ModelForm):
         fields = ("name", "route")
         widgets = {
             "route": MapboxLineStringFieldWidget,
+        }
+
+
+class InteractivePolygonFieldViewForm(forms.ModelForm):
+    class Meta:
+        model = InteractivePolygonField
+        fields = ("name", "area")
+        widgets = {
+            "area": MapboxPolygonFieldWidget,
         }

@@ -7,6 +7,7 @@ from .widgets import (
     GoogleMapPointFieldWidget,
     LeafletPointFieldWidget,
     MapboxLineStringFieldWidget,
+    MapboxPolygonFieldWidget,
     MapboxPointFieldStaticWidget,
     MapboxPointFieldWidget,
 )
@@ -18,5 +19,6 @@ __all__ = [
     "MapboxPointFieldWidget",
     "MapboxPointFieldStaticWidget",
     "MapboxLineStringFieldWidget",
+    "MapboxPolygonFieldWidget",
     "LeafletPointFieldWidget",
 ]
