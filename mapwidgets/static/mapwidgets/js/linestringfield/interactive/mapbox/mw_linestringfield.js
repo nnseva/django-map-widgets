@@ -63,8 +63,8 @@
             this.addressAutoCompleteInput = $("input:first", "#" + this.geocoderWrapID);
 
             // bind draw events
-            this.map.on('draw.create', this.handleDrawCreateOrUpdate.bind(this));
-            this.map.on('draw.update', this.handleDrawCreateOrUpdate.bind(this));
+            this.map.on('draw.create', this.handleDrawCreate.bind(this));
+            this.map.on('draw.update', this.handleDrawUpdate.bind(this));
             this.map.on('draw.delete', this.handleDrawDelete.bind(this));
 
             // initial value
@@ -92,6 +92,37 @@
                 this.currentFeatureId = (ids && ids.length) ? ids[0] : null;
                 this.updateDjangoInput(this.djangoGeoJSONValue);
                 this.fitToLine(this.djangoGeoJSONValue);
+            }
+        },
+
+        finishDrawing: function () {
+            if (!this.draw) return;
+
+            if (this.drawLineBtn && this.drawLineBtn.hasClass('active')) {
+                this.drawLineBtn.removeClass('active');
+            }
+
+            // Mapbox Draw can keep draw_line_string "alive" until the next tick;
+            // switching mode again on the next frame prevents the dangling preview
+            // segment from last vertex to mouse cursor.
+            try {
+                this.draw.changeMode('simple_select');
+            } catch (e) {
+                // ignore
+            }
+
+            const switchMode = () => {
+                try {
+                    this.draw.changeMode('simple_select');
+                } catch (e) {
+                    // ignore
+                }
+            };
+
+            if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+                window.requestAnimationFrame(switchMode);
+            } else {
+                setTimeout(switchMode, 0);
             }
         },
 
@@ -134,7 +165,7 @@
             }
         },
 
-        handleDrawCreateOrUpdate: function (e) {
+        handleDrawCreate: function (e) {
             if (!e || !e.features || !e.features.length) return;
 
             // keep only the last LineString
@@ -166,11 +197,23 @@
                 $(document).trigger(this.lineChangeTriggerNameSpace, [geom, this.wrapElemSelector, this.djangoInput]);
             }
 
-            // leave draw mode after first create/update
-            if (this.drawLineBtn.hasClass('active')) {
-                this.drawLineBtn.removeClass('active');
-            }
-            this.draw.changeMode('simple_select');
+            // leave draw mode after finishing the line
+            this.finishDrawing();
+        },
+
+        handleDrawUpdate: function (e) {
+            if (!e || !e.features || !e.features.length) return;
+
+            const lineFeatures = e.features.filter(f => f.geometry && f.geometry.type === 'LineString');
+            if (!lineFeatures.length) return;
+
+            const feature = lineFeatures[lineFeatures.length - 1];
+            this.currentFeatureId = feature.id;
+            const geom = feature.geometry;
+
+            this.updateDjangoInput(geom);
+            this.fitToLine(geom);
+            $(document).trigger(this.lineChangeTriggerNameSpace, [geom, this.wrapElemSelector, this.djangoInput]);
         },
 
         handleDrawDelete: function (e) {
