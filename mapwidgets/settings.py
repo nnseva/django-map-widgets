@@ -118,6 +118,39 @@ DEFAULT_SETTINGS = {
                 "overlayParams": {"name": "pin-l", "label": "", "color": ""},
             },
         },
+        "LineStringField": {
+            "interactive": {
+                "media": {
+                    "css": {
+                        "dev": ["mapwidgets/css/map_widgets.css"],
+                        "minified": ["mapwidgets/css/map_widgets.min.css"],
+                    },
+                    "js": {
+                        "dev": [
+                            "mapwidgets/js/mw_init.js",
+                            "mapwidgets/js/linestringfield/interactive/mw_linestringfield_base.js",
+                            "mapwidgets/js/linestringfield/interactive/mapbox/mw_linestringfield.js",
+                        ],
+                        "minified": [
+                            "mapwidgets/js/mw_init.js",
+                            "mapwidgets/js/linestringfield/interactive/mw_linestringfield_base.min.js",
+                            "mapwidgets/js/linestringfield/interactive/mapbox/mw_linestringfield.min.js",
+                        ],
+                    },
+                },
+                "showZoomNavigation": True,
+                "mapOptions": {
+                    "zoom": 12,
+                    "style": "mapbox://styles/mapbox/streets-v11",
+                    "scrollZoom": False,
+                    "animate": False,
+                    "center": get_default_center_coordinates(),
+                },
+                "geocoderOptions": {},
+                "drawOptions": {},
+                "lineFitPadding": 40,
+            }
+        },
     },
     "Leaflet": {
         "PointField": {

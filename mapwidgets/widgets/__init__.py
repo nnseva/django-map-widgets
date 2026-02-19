@@ -4,7 +4,11 @@ from .googlemap import (
     GoogleMapPointFieldWidget,
 )
 from .leaflet import LeafletPointFieldWidget
-from .mapbox import MapboxPointFieldStaticWidget, MapboxPointFieldWidget
+from .mapbox import (
+    MapboxLineStringFieldWidget,
+    MapboxPointFieldStaticWidget,
+    MapboxPointFieldWidget,
+)
 
 __all__ = [
     "GoogleMapPointFieldWidget",
@@ -12,5 +16,6 @@ __all__ = [
     "GoogleMapPointFieldStaticWidget",
     "MapboxPointFieldWidget",
     "MapboxPointFieldStaticWidget",
+    "MapboxLineStringFieldWidget",
     "LeafletPointFieldWidget",
 ]

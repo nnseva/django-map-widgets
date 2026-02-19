@@ -90,8 +90,8 @@ DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "NAME": "djmap_demo",
-        "USER": "",
-        "PASSWORD": "",
+        "USER": os.getenv('USER', ''),
+        "PASSWORD": os.getenv('PASSWORD', ''),
         "HOST": "localhost",
     }
 }

@@ -19,3 +19,11 @@ class StaticPointFieldAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.PointField: {"widget": mapwidgets.MapboxPointFieldStaticWidget}
     }
+
+
+@admin.register(mapbox_models.InteractiveLineStringField)
+class InteractiveLineStringFieldAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+    formfield_overrides = {
+        models.LineStringField: {"widget": mapwidgets.MapboxLineStringFieldWidget}
+    }

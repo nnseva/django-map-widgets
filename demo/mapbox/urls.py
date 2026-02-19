@@ -1,5 +1,8 @@
 from django.urls import path
 from mapbox.views import (
+    InteractiveLineStringFieldAddView,
+    InteractiveLineStringFieldEditView,
+    InteractiveLineStringFieldListView,
     InteractivePointFieldAddView,
     InteractivePointFieldEditView,
     InteractivePointFieldListView,
@@ -34,5 +37,20 @@ urlpatterns = [
         "pointfield/static/<int:pk>/",
         StaticPointFieldEditView.as_view(),
         name="pointfield_static_edit",
+    ),
+    path(
+        "linestringfield/interactive/",
+        InteractiveLineStringFieldListView.as_view(),
+        name="linestringfield_interactive_list",
+    ),
+    path(
+        "linestringfield/interactive/<int:pk>/",
+        InteractiveLineStringFieldEditView.as_view(),
+        name="linestringfield_interactive_edit",
+    ),
+    path(
+        "linestringfield/interactive/add/",
+        InteractiveLineStringFieldAddView.as_view(),
+        name="linestringfield_interactive_add",
     ),
 ]

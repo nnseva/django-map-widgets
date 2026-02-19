@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+    {{ form.media }}
+{% endblock extrahead %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        (function ($) {
+            $(document).on("mapboxLineStringFieldWidget:lineCreate", function (e, geometry, wrapElemSelector, djangoInput) {
+                console.log("EVENT: line_create");
+                console.log(geometry);
+                console.log(wrapElemSelector);
+                console.log(djangoInput);
+            });
+        })(jQuery)
+    </script>
+{% endblock javascript %}
+
+{% block breadcrumb_item %}
+    <li class="breadcrumb-item"><a href="{% url "mapbox:linestringfield_interactive_list" %}">Mapbox LineString Field</a></li>
+    <li class="breadcrumb-item">New Item</li>
+{% endblock %}
+
+{% block content %}
+    <h4>Add New Item</h4>
+    <form action="{% url "mapbox:linestringfield_interactive_add" %}" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <br>
+        <button type="submit" class="btn btn-primary btn-lg">Save</button>
+    </form>
+{% endblock content %}
