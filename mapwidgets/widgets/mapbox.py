@@ -4,6 +4,7 @@ from django.utils.http import urlencode
 from mapwidgets.settings import mw_settings
 from mapwidgets.widgets.base import (
     BaseLineStringFieldInteractiveWidget,
+    BaseMultiPolygonFieldInteractiveWidget,
     BasePolygonFieldInteractiveWidget,
     BasePointFieldInteractiveWidget,
     BaseStaticWidget,
@@ -73,6 +74,37 @@ class MapboxLineStringFieldWidget(BaseLineStringFieldInteractiveWidget):
 class MapboxPolygonFieldWidget(BasePolygonFieldInteractiveWidget):
     template_name = "mapwidgets/polygonfield/mapbox/interactive.html"
     _settings = mw_settings.Mapbox.PolygonField.interactive
+
+    @property
+    def settings(self):
+        settings = super().settings
+        if not mw_settings.Mapbox.accessToken:
+            raise ImproperlyConfigured(
+                "`Mapbox.accessToken` setting is required to use Mapbox widgets."
+            )
+        settings["accessToken"] = mw_settings.Mapbox.accessToken
+        return settings
+
+    @property
+    def media(self):
+        return self._media(
+            extra_js=[
+                "https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js",
+                "https://unpkg.com/@mapbox/mapbox-sdk/umd/mapbox-sdk.min.js",
+                "https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js",
+                "https://unpkg.com/@mapbox/mapbox-gl-draw@1.5.0/dist/mapbox-gl-draw.js",
+            ],
+            extra_css=[
+                "https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css",
+                "https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.css",
+                "https://unpkg.com/@mapbox/mapbox-gl-draw@1.5.0/dist/mapbox-gl-draw.css",
+            ],
+        )
+
+
+class MapboxMultiPolygonFieldWidget(BaseMultiPolygonFieldInteractiveWidget):
+    template_name = "mapwidgets/multipolygonfield/mapbox/interactive.html"
+    _settings = mw_settings.Mapbox.MultiPolygonField.interactive
 
     @property
     def settings(self):

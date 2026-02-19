@@ -6,6 +6,7 @@ from .googlemap import (
 from .leaflet import LeafletPointFieldWidget
 from .mapbox import (
     MapboxLineStringFieldWidget,
+    MapboxMultiPolygonFieldWidget,
     MapboxPolygonFieldWidget,
     MapboxPointFieldStaticWidget,
     MapboxPointFieldWidget,
@@ -19,5 +20,6 @@ __all__ = [
     "MapboxPointFieldStaticWidget",
     "MapboxLineStringFieldWidget",
     "MapboxPolygonFieldWidget",
+    "MapboxMultiPolygonFieldWidget",
     "LeafletPointFieldWidget",
 ]

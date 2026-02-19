@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+    {{ form.media }}
+{% endblock extrahead %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        (function ($) {
+            $(document).on("mapboxMultiPolygonFieldWidget:multiPolygonCreate", function (e, geometry, wrapElemSelector, djangoInput) {
+                console.log("EVENT: multipolygon_create");
+                console.log(geometry);
+                console.log(wrapElemSelector);
+                console.log(djangoInput);
+            });
+
+            $(document).on("mapboxMultiPolygonFieldWidget:multiPolygonChange", function (e, geometry, wrapElemSelector, djangoInput) {
+                console.log("EVENT: multipolygon_change");
+                console.log(geometry);
+                console.log(wrapElemSelector);
+                console.log(djangoInput);
+            });
+
+            $(document).on("mapboxMultiPolygonFieldWidget:multiPolygonDelete", function (e, geometry, wrapElemSelector, djangoInput) {
+                console.log("EVENT: multipolygon_delete");
+                console.log(geometry);
+                console.log(wrapElemSelector);
+                console.log(djangoInput);
+            });
+
+            $(document).on("mapboxMultiPolygonFieldWidget:placeChanged", function (e, place, lat, lng, wrapElemSelector, djangoInput) {
+                console.log("EVENT: place_changed");
+                console.log(place);
+                console.log(lat, lng);
+                console.log(wrapElemSelector);
+                console.log(djangoInput);
+            });
+        })(jQuery)
+    </script>
+{% endblock javascript %}
+
+{% block breadcrumb_item %}
+    <li class="breadcrumb-item"><a href="{% url "mapbox:multipolygonfield_interactive_list" %}">Mapbox MultiPolygon Field</a></li>
+{% endblock %}
+
+{% block content %}
+    <h4>{{ obj.name }}</h4>
+    <form action="{% url "mapbox:multipolygonfield_interactive_edit" obj.pk %}" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <br>
+        <button type="submit" class="btn btn-primary btn-lg">Save</button>
+    </form>
+{% endblock content %}

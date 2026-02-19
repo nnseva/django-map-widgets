@@ -1,5 +1,5 @@
 from django.contrib.gis.db import models
-from django.contrib.gis.geos import LineString, Point, Polygon
+from django.contrib.gis.geos import LineString, MultiPolygon, Point, Polygon
 from django.urls import reverse
 
 from demo.db import BaseModel
@@ -19,6 +19,30 @@ DEFAULT_LOCATION_POLYGON = Polygon(
         (-104.9803, 39.7492),
         (-104.9903, 39.7492),
         (-104.9903, 39.7392),
+    ),
+    srid=4326,
+)
+
+DEFAULT_LOCATION_MULTIPOLYGON = MultiPolygon(
+    Polygon(
+        (
+            (-104.9903, 39.7392),
+            (-104.9803, 39.7392),
+            (-104.9803, 39.7492),
+            (-104.9903, 39.7492),
+            (-104.9903, 39.7392),
+        ),
+        srid=4326,
+    ),
+    Polygon(
+        (
+            (-104.9703, 39.7392),
+            (-104.9603, 39.7392),
+            (-104.9603, 39.7492),
+            (-104.9703, 39.7492),
+            (-104.9703, 39.7392),
+        ),
+        srid=4326,
     ),
     srid=4326,
 )
@@ -89,3 +113,26 @@ class InteractivePolygonField(BaseModel):
 
     def get_absolute_url(self):
         return reverse("mapbox:polygonfield_interactive_edit", args=(self.id,))
+
+
+class InteractiveMultiPolygonField(BaseModel):
+    name = models.CharField(max_length=255)
+    areas = models.MultiPolygonField(
+        help_text="Use map widget to draw one or more polygons",
+        srid=4326,
+    )
+    areas_has_default = models.MultiPolygonField(
+        default=DEFAULT_LOCATION_MULTIPOLYGON,
+        srid=4326,
+    )
+    areas_optional = models.MultiPolygonField(blank=True, null=True, srid=4326)
+
+    class Meta:
+        verbose_name = "Interactive MultiPolygonField Widget"
+        verbose_name_plural = "Interactive MultiPolygonField Widget"
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("mapbox:multipolygonfield_interactive_edit", args=(self.id,))

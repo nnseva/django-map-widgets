@@ -3,6 +3,9 @@ from mapbox.views import (
     InteractiveLineStringFieldAddView,
     InteractiveLineStringFieldEditView,
     InteractiveLineStringFieldListView,
+    InteractiveMultiPolygonFieldAddView,
+    InteractiveMultiPolygonFieldEditView,
+    InteractiveMultiPolygonFieldListView,
     InteractivePointFieldAddView,
     InteractivePointFieldEditView,
     InteractivePointFieldListView,
@@ -70,5 +73,20 @@ urlpatterns = [
         "polygonfield/interactive/add/",
         InteractivePolygonFieldAddView.as_view(),
         name="polygonfield_interactive_add",
+    ),
+    path(
+        "multipolygonfield/interactive/",
+        InteractiveMultiPolygonFieldListView.as_view(),
+        name="multipolygonfield_interactive_list",
+    ),
+    path(
+        "multipolygonfield/interactive/<int:pk>/",
+        InteractiveMultiPolygonFieldEditView.as_view(),
+        name="multipolygonfield_interactive_edit",
+    ),
+    path(
+        "multipolygonfield/interactive/add/",
+        InteractiveMultiPolygonFieldAddView.as_view(),
+        name="multipolygonfield_interactive_add",
     ),
 ]

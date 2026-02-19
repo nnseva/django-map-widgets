@@ -2,12 +2,14 @@ from django.urls import reverse_lazy
 from django.views.generic import FormView, ListView, UpdateView
 from mapbox.forms import (
     InteractiveLineStringFieldViewForm,
+    InteractiveMultiPolygonFieldViewForm,
     InteractivePointFieldViewForm,
     InteractivePolygonFieldViewForm,
     StaticPointFieldViewForm,
 )
 from mapbox.models import (
     InteractiveLineStringField,
+    InteractiveMultiPolygonField,
     InteractivePointField,
     InteractivePolygonField,
     StaticPointField,
@@ -98,3 +100,27 @@ class InteractivePolygonFieldAddView(FormView):
     def form_valid(self, form):
         form.save()
         return super(InteractivePolygonFieldAddView, self).form_valid(form)
+
+
+class InteractiveMultiPolygonFieldListView(ListView):
+    queryset = InteractiveMultiPolygonField.objects.all().order_by("-updated_at")
+    template_name = "mapbox/multipolygonfield/interactive/list.html"
+    context_object_name = "multipolygonfield_objs"
+
+
+class InteractiveMultiPolygonFieldEditView(UpdateView):
+    form_class = InteractiveMultiPolygonFieldViewForm
+    model = InteractiveMultiPolygonField
+    template_name = "mapbox/multipolygonfield/interactive/edit.html"
+    context_object_name = "obj"
+    success_url = reverse_lazy("mapbox:multipolygonfield_interactive_list")
+
+
+class InteractiveMultiPolygonFieldAddView(FormView):
+    template_name = "mapbox/multipolygonfield/interactive/add.html"
+    form_class = InteractiveMultiPolygonFieldViewForm
+    success_url = reverse_lazy("mapbox:multipolygonfield_interactive_list")
+
+    def form_valid(self, form):
+        form.save()
+        return super(InteractiveMultiPolygonFieldAddView, self).form_valid(form)

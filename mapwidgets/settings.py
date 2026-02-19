@@ -184,6 +184,39 @@ DEFAULT_SETTINGS = {
                 "polygonFitPadding": 40,
             }
         },
+        "MultiPolygonField": {
+            "interactive": {
+                "media": {
+                    "css": {
+                        "dev": ["mapwidgets/css/map_widgets.css"],
+                        "minified": ["mapwidgets/css/map_widgets.min.css"],
+                    },
+                    "js": {
+                        "dev": [
+                            "mapwidgets/js/mw_init.js",
+                            "mapwidgets/js/multipolygonfield/interactive/mw_multipolygonfield_base.js",
+                            "mapwidgets/js/multipolygonfield/interactive/mapbox/mw_multipolygonfield.js",
+                        ],
+                        "minified": [
+                            "mapwidgets/js/mw_init.js",
+                            "mapwidgets/js/multipolygonfield/interactive/mw_multipolygonfield_base.min.js",
+                            "mapwidgets/js/multipolygonfield/interactive/mapbox/mw_multipolygonfield.min.js",
+                        ],
+                    },
+                },
+                "showZoomNavigation": True,
+                "mapOptions": {
+                    "zoom": 12,
+                    "style": "mapbox://styles/mapbox/streets-v11",
+                    "scrollZoom": False,
+                    "animate": False,
+                    "center": get_default_center_coordinates(),
+                },
+                "geocoderOptions": {},
+                "drawOptions": {},
+                "polygonFitPadding": 40,
+            }
+        },
     },
     "Leaflet": {
         "PointField": {

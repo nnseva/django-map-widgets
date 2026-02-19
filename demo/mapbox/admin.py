@@ -35,3 +35,11 @@ class InteractivePolygonFieldAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.PolygonField: {"widget": mapwidgets.MapboxPolygonFieldWidget}
     }
+
+
+@admin.register(mapbox_models.InteractiveMultiPolygonField)
+class InteractiveMultiPolygonFieldAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+    formfield_overrides = {
+        models.MultiPolygonField: {"widget": mapwidgets.MapboxMultiPolygonFieldWidget}
+    }
