@@ -1,13 +1,13 @@
 [tool.poetry]
-name = "demo"
-version = "1.0.0"
+name = "django-map-widgets"
+version = "0.5.2"
 description = ""
 authors = ["Erdem Ozkol <github@erdemozkol.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
-django = "^5.0.4"
+python = ">=3.11,<4.0"
+django = ">=2.5"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.4.2"
