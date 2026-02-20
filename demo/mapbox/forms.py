@@ -10,9 +10,9 @@ from mapbox.models import (
 from mapwidgets import (
     MapboxLineStringFieldWidget,
     MapboxMultiPolygonFieldWidget,
-    MapboxPolygonFieldWidget,
     MapboxPointFieldStaticWidget,
     MapboxPointFieldWidget,
+    MapboxPolygonFieldWidget,
 )
 
 

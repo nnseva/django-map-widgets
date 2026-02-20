@@ -80,6 +80,8 @@ class BaseInteractiveWidget(SettingsMixin, forms.BaseGeometryWidget):
         }
         context.update(extra_context)
         return context
+
+
 class BaseStaticWidget(SettingsMixin, forms.TextInput):
     template_name = "mapwidgets/static_widget.html"
     _base_url = None

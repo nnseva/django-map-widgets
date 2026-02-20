@@ -2,10 +2,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.http import urlencode
 
 from mapwidgets.settings import mw_settings
-from mapwidgets.widgets.base import (
-    BaseInteractiveWidget,
-    BaseStaticWidget,
-)
+from mapwidgets.widgets.base import BaseInteractiveWidget, BaseStaticWidget
 
 
 class MapboxPointFieldWidget(BaseInteractiveWidget):

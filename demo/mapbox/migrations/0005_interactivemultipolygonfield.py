@@ -9,24 +9,71 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('mapbox', '0004_interactivepolygonfield'),
+        ("mapbox", "0004_interactivepolygonfield"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='InteractiveMultiPolygonField',
+            name="InteractiveMultiPolygonField",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=255)),
-                ('areas', django.contrib.gis.db.models.fields.MultiPolygonField(help_text='Use map widget to draw one or more polygons', srid=4326)),
-                ('areas_has_default', django.contrib.gis.db.models.fields.MultiPolygonField(default=django.contrib.gis.geos.collections.MultiPolygon(django.contrib.gis.geos.polygon.Polygon(((-104.9903, 39.7392), (-104.9803, 39.7392), (-104.9803, 39.7492), (-104.9903, 39.7492), (-104.9903, 39.7392)), srid=4326), django.contrib.gis.geos.polygon.Polygon(((-104.9703, 39.7392), (-104.9603, 39.7392), (-104.9603, 39.7492), (-104.9703, 39.7492), (-104.9703, 39.7392)), srid=4326), srid=4326), srid=4326)),
-                ('areas_optional', django.contrib.gis.db.models.fields.MultiPolygonField(blank=True, null=True, srid=4326)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=255)),
+                (
+                    "areas",
+                    django.contrib.gis.db.models.fields.MultiPolygonField(
+                        help_text="Use map widget to draw one or more polygons",
+                        srid=4326,
+                    ),
+                ),
+                (
+                    "areas_has_default",
+                    django.contrib.gis.db.models.fields.MultiPolygonField(
+                        default=django.contrib.gis.geos.collections.MultiPolygon(
+                            django.contrib.gis.geos.polygon.Polygon(
+                                (
+                                    (-104.9903, 39.7392),
+                                    (-104.9803, 39.7392),
+                                    (-104.9803, 39.7492),
+                                    (-104.9903, 39.7492),
+                                    (-104.9903, 39.7392),
+                                ),
+                                srid=4326,
+                            ),
+                            django.contrib.gis.geos.polygon.Polygon(
+                                (
+                                    (-104.9703, 39.7392),
+                                    (-104.9603, 39.7392),
+                                    (-104.9603, 39.7492),
+                                    (-104.9703, 39.7492),
+                                    (-104.9703, 39.7392),
+                                ),
+                                srid=4326,
+                            ),
+                            srid=4326,
+                        ),
+                        srid=4326,
+                    ),
+                ),
+                (
+                    "areas_optional",
+                    django.contrib.gis.db.models.fields.MultiPolygonField(
+                        blank=True, null=True, srid=4326
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Interactive MultiPolygonField Widget',
-                'verbose_name_plural': 'Interactive MultiPolygonField Widget',
+                "verbose_name": "Interactive MultiPolygonField Widget",
+                "verbose_name_plural": "Interactive MultiPolygonField Widget",
             },
         ),
     ]

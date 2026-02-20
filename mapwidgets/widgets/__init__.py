@@ -7,9 +7,9 @@ from .leaflet import LeafletPointFieldWidget
 from .mapbox import (
     MapboxLineStringFieldWidget,
     MapboxMultiPolygonFieldWidget,
-    MapboxPolygonFieldWidget,
     MapboxPointFieldStaticWidget,
     MapboxPointFieldWidget,
+    MapboxPolygonFieldWidget,
 )
 
 __all__ = [
