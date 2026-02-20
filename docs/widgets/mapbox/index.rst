@@ -8,3 +8,6 @@ Mapbox Widgets
 
     PointField/interactive
     PointField/static
+    LineStringField/interactive
+    PolygonField/interactive
+    MultiPolygonField/interactive

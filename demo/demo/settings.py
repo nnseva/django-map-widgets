@@ -89,10 +89,11 @@ WSGI_APPLICATION = "demo.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": "djmap_demo",
-        "USER": os.getenv('USER', ''),
-        "PASSWORD": os.getenv('PASSWORD', ''),
-        "HOST": "localhost",
+        "NAME": os.getenv("NAME", "djmap_demo"),
+        "USER": os.getenv("USER", ""),
+        "PASSWORD": os.getenv("PASSWORD", ""),
+        "HOST": os.getenv("HOST", "localhost"),
+        "PORT": int(os.getenv("PORT", "5432")),
     }
 }
 

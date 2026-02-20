@@ -33,6 +33,11 @@ Set environment variables.
 | GOOGLE_MAP_API_SECRET  | Required for GoogleMap static widgets.                                                                  |
 | MAPBOX_ACCESS_TOKEN    | Required for Mapbox interactive widgets.                                                                |
 | MAPBOX_ACCESS_USERNAME | Set this if Mapbox static map images will use a custom user map style; otherwise, it can be left as is. |
+| NAME                   | Set this to the name of the test database, "djmap_demo" by default                                      |
+| HOST                   | Set this to the host of the test database, "localhost"  by default                                      |
+| PORT                   | Set this to the port of the test database, "5432"  by default                                           |
+| USER                   | Set this to the user of the test database, ""  by default                                               |
+| PASSWORD               | Set this to the password of the test database, ""  by default                                           |
 
 Run the development server and start exploring the project at [http://localhost:8000/](http://localhost:8000/).
 
