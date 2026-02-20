@@ -1,73 +1,27 @@
+{% extends "mapwidgets/mapbox/interactive_base.html" %}
 {% load i18n %}
 
-<div class="mw-wrap" id="{{ name }}-mw-wrap">
-    {% block container %}
-        <div class="mw-header">
-            {% block header %}
-                <a class="mw-btn mw-btn-warning mw-btn-draw-polygon">
-                    <i class="icon-location"></i>
-                    <span class="button-text">{% trans "Draw Polygon" %}</span>
-                </a>
-                <a class="mw-btn mw-btn-info mw-btn-my-location">
-                    <i class="icon-direction"></i>
-                    <span class="button-text">{% trans "Current Location" %}</span>
-                </a>
-                <div class="mw-adress-input-wrap pull-right" id="{{ name }}-geocoder-wrap"></div>
-            {% endblock header %}
-        </div>
+{% block primary_action_button %}
+    <a class="mw-btn mw-btn-warning mw-btn-draw-polygon">
+        <i class="icon-location"></i>
+        <span class="button-text">{% trans "Draw Polygon" %}</span>
+    </a>
+{% endblock primary_action_button %}
 
-        <div class="mw-map-wrapper">
-            <div class="mw-loader-overlay hide">
-                <div class="mw-loader"></div>
-            </div>
-            <div id="{{ name }}-map-elem" class="mw-map"></div>
-            <div style="display: none" class="hide">
-                <textarea id="{{ id }}" name="{{ name }}">{{ serialized }}</textarea>
-                {% block extra_input %}
-                {% endblock extra_input %}
-            </div>
-        </div>
+{% block footer_help_text %}
+    <span class="mw-help-text help-text">{% trans "Draw or edit polygons on the map" %}</span>
+{% endblock footer_help_text %}
 
-        <div class="mw-footer">
-            <span class="mw-help-text help-text">{% trans "Draw or edit polygons on the map" %}</span>
-            <a class="mw-btn mw-btn-delete pull-right {{ serialized|yesno:"mw-btn-danger, mw-btn-default disabled" }}">
-                <i class="icon-trash-empty"></i>
-            </a>
-        </div>
-        <div class="animated-loader"></div>
-    {% endblock container %}
-</div>
+{% block widget_options %}
+    Object.assign(mapWidgetOptions, {
+        drawPolygonBtn: $(".mw-btn-draw-polygon", wrapElemSelector),
+        multiPolygonCreateTriggerNameSpace: "mapboxMultiPolygonFieldWidget:multiPolygonCreate",
+        multiPolygonChangeTriggerNameSpace: "mapboxMultiPolygonFieldWidget:multiPolygonChange",
+        multiPolygonDeleteTriggerNameSpace: "mapboxMultiPolygonFieldWidget:multiPolygonDelete",
+        placeChangedTriggerNameSpace: "mapboxMultiPolygonFieldWidget:placeChanged"
+    });
+{% endblock widget_options %}
 
-{% block javascript %}
-    <script type="application/javascript">
-        (function ($) {
-            const mapOptions = JSON.parse("{{ options|escapejs }}");
-            const fieldValue = JSON.parse("{{ field_value|escapejs }}");
-
-            const wrapElemSelector = "#{{ name }}-mw-wrap";
-            const mapElemID = "{{ name }}-map-elem";
-            const mapboxGeocoderWrapID = "{{ name }}-geocoder-wrap";
-            const locationInputID = "#{{ id }}";
-
-            const mapWidgetOptions = {
-                djangoInput: $(locationInputID),
-                geocoderWrapID: mapboxGeocoderWrapID,
-                geocoderInputPlaceholderText: "{% trans 'Find a Location by Address' %}",
-                wrapElemSelector: wrapElemSelector,
-                djangoGeoJSONValue: fieldValue,
-                mapElement: document.getElementById(mapElemID),
-                mapOptions: mapOptions,
-                deleteBtn: $(".mw-btn-delete", wrapElemSelector),
-                drawPolygonBtn: $(".mw-btn-draw-polygon", wrapElemSelector),
-                myLocationBtn: $(".mw-btn-my-location", wrapElemSelector),
-                loaderOverlayElem: $(".mw-loader-overlay", wrapElemSelector),
-                multiPolygonCreateTriggerNameSpace: "mapboxMultiPolygonFieldWidget:multiPolygonCreate",
-                multiPolygonChangeTriggerNameSpace: "mapboxMultiPolygonFieldWidget:multiPolygonChange",
-                multiPolygonDeleteTriggerNameSpace: "mapboxMultiPolygonFieldWidget:multiPolygonDelete",
-                placeChangedTriggerNameSpace: "mapboxMultiPolygonFieldWidget:placeChanged"
-            };
-
-            new DjangoMapboxMultiPolygonFieldWidget(mapWidgetOptions);
-        })(mapWidgets.jQuery);
-    </script>
-{% endblock javascript %}
+{% block widget_init %}
+    new DjangoMapboxMultiPolygonFieldWidget(mapWidgetOptions);
+{% endblock widget_init %}

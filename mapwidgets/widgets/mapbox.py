@@ -3,15 +3,12 @@ from django.utils.http import urlencode
 
 from mapwidgets.settings import mw_settings
 from mapwidgets.widgets.base import (
-    BaseLineStringFieldInteractiveWidget,
-    BaseMultiPolygonFieldInteractiveWidget,
-    BasePolygonFieldInteractiveWidget,
-    BasePointFieldInteractiveWidget,
+    BaseInteractiveWidget,
     BaseStaticWidget,
 )
 
 
-class MapboxPointFieldWidget(BasePointFieldInteractiveWidget):
+class MapboxPointFieldWidget(BaseInteractiveWidget):
     template_name = "mapwidgets/pointfield/mapbox/interactive.html"
     _settings = mw_settings.Mapbox.PointField.interactive
 
@@ -40,7 +37,7 @@ class MapboxPointFieldWidget(BasePointFieldInteractiveWidget):
         )
 
 
-class MapboxLineStringFieldWidget(BaseLineStringFieldInteractiveWidget):
+class MapboxLineStringFieldWidget(BaseInteractiveWidget):
     template_name = "mapwidgets/linestringfield/mapbox/interactive.html"
     _settings = mw_settings.Mapbox.LineStringField.interactive
 
@@ -71,7 +68,7 @@ class MapboxLineStringFieldWidget(BaseLineStringFieldInteractiveWidget):
         )
 
 
-class MapboxPolygonFieldWidget(BasePolygonFieldInteractiveWidget):
+class MapboxPolygonFieldWidget(BaseInteractiveWidget):
     template_name = "mapwidgets/polygonfield/mapbox/interactive.html"
     _settings = mw_settings.Mapbox.PolygonField.interactive
 
@@ -102,7 +99,7 @@ class MapboxPolygonFieldWidget(BasePolygonFieldInteractiveWidget):
         )
 
 
-class MapboxMultiPolygonFieldWidget(BaseMultiPolygonFieldInteractiveWidget):
+class MapboxMultiPolygonFieldWidget(BaseInteractiveWidget):
     template_name = "mapwidgets/multipolygonfield/mapbox/interactive.html"
     _settings = mw_settings.Mapbox.MultiPolygonField.interactive
 

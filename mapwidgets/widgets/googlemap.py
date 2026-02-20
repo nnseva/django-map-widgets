@@ -8,11 +8,11 @@ from django.utils.http import urlencode
 
 from mapwidgets.settings import mw_settings
 from mapwidgets.utils import AsyncJS
-from mapwidgets.widgets.base import BasePointFieldInteractiveWidget, BaseStaticWidget
+from mapwidgets.widgets.base import BaseInteractiveWidget, BaseStaticWidget
 from mapwidgets.widgets.mixins import PointFieldInlineWidgetMixin
 
 
-class GoogleMapPointFieldWidget(BasePointFieldInteractiveWidget):
+class GoogleMapPointFieldWidget(BaseInteractiveWidget):
     template_name = "mapwidgets/pointfield/googlemap/interactive.html"
     _settings = mw_settings.GoogleMap.PointField.interactive
 
