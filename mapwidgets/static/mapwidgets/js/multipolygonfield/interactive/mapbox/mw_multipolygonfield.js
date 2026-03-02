@@ -61,6 +61,10 @@
 
             this.map.addControl(this.draw);
 
+            // Capture initial interaction handler states so we can restore them after Mapbox Draw
+            // temporarily disables map interactions during create/edit.
+            this.captureMapInteractionState();
+
             // store
             $(this.mapElement).data('mwMapObj', this.map);
             $(this.mapElement).data('mwClassObj', this);
@@ -70,6 +74,7 @@
             this.map.on('draw.create', this.handleDrawCreate.bind(this));
             this.map.on('draw.update', this.handleDrawUpdate.bind(this));
             this.map.on('draw.delete', this.handleDrawDelete.bind(this));
+            this.map.on('draw.modechange', this.handleDrawModeChange.bind(this));
 
             // initial value
             var initialGeom = null;
@@ -109,6 +114,77 @@
             }
         },
 
+        captureMapInteractionState: function () {
+            if (!this.map) return;
+
+            var handlers = [
+                'dragPan',
+                'scrollZoom',
+                'boxZoom',
+                'dragRotate',
+                'keyboard',
+                'doubleClickZoom',
+                'touchZoomRotate'
+            ];
+
+            this._mwInteractionState = {};
+
+            for (var i = 0; i < handlers.length; i++) {
+                var handlerName = handlers[i];
+                var handler = this.map[handlerName];
+                if (handler && typeof handler.isEnabled === 'function') {
+                    try {
+                        this._mwInteractionState[handlerName] = handler.isEnabled();
+                    } catch (e) {
+                        // ignore
+                    }
+                }
+            }
+        },
+
+        restoreMapInteractionState: function () {
+            if (!this.map || !this._mwInteractionState) return;
+
+            for (var handlerName in this._mwInteractionState) {
+                if (!Object.prototype.hasOwnProperty.call(this._mwInteractionState, handlerName)) continue;
+
+                var shouldBeEnabled = this._mwInteractionState[handlerName];
+                var handler = this.map[handlerName];
+                if (!handler) continue;
+
+                try {
+                    if (shouldBeEnabled && typeof handler.enable === 'function') {
+                        handler.enable();
+                    } else if (!shouldBeEnabled && typeof handler.disable === 'function') {
+                        handler.disable();
+                    }
+                } catch (e) {
+                    // ignore
+                }
+            }
+        },
+
+        deferRestoreMapInteractionState: function () {
+            var self = this;
+            var restore = function () {
+                self.restoreMapInteractionState();
+            };
+
+            if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+                window.requestAnimationFrame(function () {
+                    setTimeout(restore, 0);
+                });
+            } else {
+                setTimeout(restore, 0);
+            }
+        },
+
+        handleDrawModeChange: function (e) {
+            if (e && e.mode === 'simple_select') {
+                this.deferRestoreMapInteractionState();
+            }
+        },
+
         finishDrawing: function () {
             if (!this.draw) return;
 
@@ -136,6 +212,8 @@
             } else {
                 setTimeout(switchMode, 0);
             }
+
+            this.deferRestoreMapInteractionState();
         },
 
         panTo: function (lat, lng) {
@@ -200,7 +278,9 @@
             var mp = this.collectMultiPolygonGeometry();
 
             this.updateDjangoInput(mp);
-            if (mp) {
+            // Avoid surprising view jumps: fit only when the geometry is first created
+            // (or when explicitly enabled for edits).
+            if (mp && (!hadValue || this.mapOptions.fitBoundsOnEdit === true)) {
                 this.fitToMultiPolygon(mp);
             }
 
@@ -216,10 +296,13 @@
         handleDrawUpdate: function () {
             var mp = this.collectMultiPolygonGeometry();
             this.updateDjangoInput(mp);
-            if (mp) {
+            // Do not auto-fit after edits by default.
+            if (mp && this.mapOptions.fitBoundsOnEdit === true) {
                 this.fitToMultiPolygon(mp);
             }
             $(document).trigger(this.multiPolygonChangeTriggerNameSpace, [mp, this.wrapElemSelector, this.djangoInput]);
+
+            this.deferRestoreMapInteractionState();
         },
 
         handleDrawDelete: function () {
