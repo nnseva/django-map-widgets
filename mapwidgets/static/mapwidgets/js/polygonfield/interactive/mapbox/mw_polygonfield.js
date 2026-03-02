@@ -57,6 +57,10 @@
 
             this.map.addControl(this.draw);
 
+            // Capture initial interaction handler states so we can restore them after Mapbox Draw
+            // temporarily disables map interactions during create/edit.
+            this.captureMapInteractionState();
+
             // store
             $(this.mapElement).data('mwMapObj', this.map);
             $(this.mapElement).data('mwClassObj', this);
@@ -66,6 +70,7 @@
             this.map.on('draw.create', this.handleDrawCreate.bind(this));
             this.map.on('draw.update', this.handleDrawUpdate.bind(this));
             this.map.on('draw.delete', this.handleDrawDelete.bind(this));
+            this.map.on('draw.modechange', this.handleDrawModeChange.bind(this));
 
             // initial value
             if (this.djangoGeoJSONValue && this.djangoGeoJSONValue.geojson) {
@@ -95,6 +100,67 @@
             }
         },
 
+        captureMapInteractionState: function () {
+            if (!this.map) return;
+            const handlers = [
+                'dragPan',
+                'scrollZoom',
+                'boxZoom',
+                'dragRotate',
+                'keyboard',
+                'doubleClickZoom',
+                'touchZoomRotate'
+            ];
+            this._mwInteractionState = {};
+            for (let i = 0; i < handlers.length; i++) {
+                const handlerName = handlers[i];
+                const handler = this.map[handlerName];
+                if (handler && typeof handler.isEnabled === 'function') {
+                    try {
+                        this._mwInteractionState[handlerName] = handler.isEnabled();
+                    } catch (e) {
+                        // ignore
+                    }
+                }
+            }
+        },
+
+        restoreMapInteractionState: function () {
+            if (!this.map || !this._mwInteractionState) return;
+
+            for (const handlerName in this._mwInteractionState) {
+                if (!Object.prototype.hasOwnProperty.call(this._mwInteractionState, handlerName)) continue;
+                const shouldBeEnabled = this._mwInteractionState[handlerName];
+                const handler = this.map[handlerName];
+                if (!handler) continue;
+
+                try {
+                    if (shouldBeEnabled && typeof handler.enable === 'function') {
+                        handler.enable();
+                    } else if (!shouldBeEnabled && typeof handler.disable === 'function') {
+                        handler.disable();
+                    }
+                } catch (e) {
+                    // ignore
+                }
+            }
+        },
+
+        deferRestoreMapInteractionState: function () {
+            const restore = this.restoreMapInteractionState.bind(this);
+            if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+                window.requestAnimationFrame(() => setTimeout(restore, 0));
+            } else {
+                setTimeout(restore, 0);
+            }
+        },
+
+        handleDrawModeChange: function (e) {
+            if (e && e.mode === 'simple_select') {
+                this.deferRestoreMapInteractionState();
+            }
+        },
+
         finishDrawing: function () {
             if (!this.draw) return;
 
@@ -121,6 +187,8 @@
             } else {
                 setTimeout(switchMode, 0);
             }
+
+            this.deferRestoreMapInteractionState();
         },
 
         panTo: function (lat, lng) {
@@ -157,6 +225,7 @@
                 this.draw.changeMode('draw_polygon');
             } else {
                 this.draw.changeMode('simple_select');
+                this.deferRestoreMapInteractionState();
             }
         },
 
@@ -182,7 +251,11 @@
             const geom = feature.geometry;
             const hadValue = !$.isEmptyObject(this.djangoGeoJSONValue);
             this.updateDjangoInput(geom);
-            this.fitToPolygon(geom);
+            // Avoid surprising view jumps: fit only when the geometry is first created
+            // (or when explicitly enabled for edits).
+            if (!hadValue || this.mapOptions.fitBoundsOnEdit === true) {
+                this.fitToPolygon(geom);
+            }
 
             if (!hadValue) {
                 $(document).trigger(this.polygonCreateTriggerNameSpace, [geom, this.wrapElemSelector, this.djangoInput]);
@@ -204,8 +277,13 @@
             const geom = feature.geometry;
 
             this.updateDjangoInput(geom);
-            this.fitToPolygon(geom);
+            // Do not auto-fit after edits by default.
+            if (this.mapOptions.fitBoundsOnEdit === true) {
+                this.fitToPolygon(geom);
+            }
             $(document).trigger(this.polygonChangeTriggerNameSpace, [geom, this.wrapElemSelector, this.djangoInput]);
+
+            this.deferRestoreMapInteractionState();
         },
 
         handleDrawDelete: function () {

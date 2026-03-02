@@ -57,6 +57,10 @@
 
             this.map.addControl(this.draw);
 
+            // Capture the initial interaction handler states (dragPan, scrollZoom, etc.) so we can
+            // restore them after Mapbox Draw temporarily disables interactions during edit.
+            this.captureMapInteractionState();
+
             // store
             $(this.mapElement).data('mwMapObj', this.map);
             $(this.mapElement).data('mwClassObj', this);
@@ -66,6 +70,7 @@
             this.map.on('draw.create', this.handleDrawCreate.bind(this));
             this.map.on('draw.update', this.handleDrawUpdate.bind(this));
             this.map.on('draw.delete', this.handleDrawDelete.bind(this));
+            this.map.on('draw.modechange', this.handleDrawModeChange.bind(this));
 
             // initial value
             if (this.djangoGeoJSONValue && this.djangoGeoJSONValue.geojson) {
@@ -92,6 +97,68 @@
                 this.currentFeatureId = (ids && ids.length) ? ids[0] : null;
                 this.updateDjangoInput(this.djangoGeoJSONValue);
                 this.fitToLine(this.djangoGeoJSONValue);
+            }
+        },
+
+        captureMapInteractionState: function () {
+            if (!this.map) return;
+            const handlers = [
+                'dragPan',
+                'scrollZoom',
+                'boxZoom',
+                'dragRotate',
+                'keyboard',
+                'doubleClickZoom',
+                'touchZoomRotate'
+            ];
+            this._mwInteractionState = {};
+            for (let i = 0; i < handlers.length; i++) {
+                const handlerName = handlers[i];
+                const handler = this.map[handlerName];
+                if (handler && typeof handler.isEnabled === 'function') {
+                    try {
+                        this._mwInteractionState[handlerName] = handler.isEnabled();
+                    } catch (e) {
+                        // ignore
+                    }
+                }
+            }
+        },
+
+        restoreMapInteractionState: function () {
+            if (!this.map || !this._mwInteractionState) return;
+
+            for (const handlerName in this._mwInteractionState) {
+                if (!Object.prototype.hasOwnProperty.call(this._mwInteractionState, handlerName)) continue;
+                const shouldBeEnabled = this._mwInteractionState[handlerName];
+                const handler = this.map[handlerName];
+                if (!handler) continue;
+
+                try {
+                    if (shouldBeEnabled && typeof handler.enable === 'function') {
+                        handler.enable();
+                    } else if (!shouldBeEnabled && typeof handler.disable === 'function') {
+                        handler.disable();
+                    }
+                } catch (e) {
+                    // ignore
+                }
+            }
+        },
+
+        deferRestoreMapInteractionState: function () {
+            const restore = this.restoreMapInteractionState.bind(this);
+            if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+                window.requestAnimationFrame(() => setTimeout(restore, 0));
+            } else {
+                setTimeout(restore, 0);
+            }
+        },
+
+        handleDrawModeChange: function (e) {
+            // When leaving Draw modes, ensure map interactions (especially dragPan) are restored.
+            if (e && e.mode === 'simple_select') {
+                this.deferRestoreMapInteractionState();
             }
         },
 
@@ -124,6 +191,10 @@
             } else {
                 setTimeout(switchMode, 0);
             }
+
+            // Some Mapbox Draw interaction handlers can leave dragPan disabled if mode switches
+            // happen inside draw event callbacks. Restore interaction state after the mode switch.
+            this.deferRestoreMapInteractionState();
         },
 
         panTo: function (lat, lng) {
@@ -162,6 +233,7 @@
             } else {
                 // back to select mode
                 this.draw.changeMode('simple_select');
+                this.deferRestoreMapInteractionState();
             }
         },
 
@@ -189,7 +261,11 @@
             const geom = feature.geometry;
             const hadValue = !$.isEmptyObject(this.djangoGeoJSONValue);
             this.updateDjangoInput(geom);
-            this.fitToLine(geom);
+            // Avoid surprising view jumps: fit only when the geometry is first created
+            // (or when explicitly enabled for edits).
+            if (!hadValue || this.mapOptions.fitBoundsOnEdit === true) {
+                this.fitToLine(geom);
+            }
 
             if (!hadValue) {
                 $(document).trigger(this.lineCreateTriggerNameSpace, [geom, this.wrapElemSelector, this.djangoInput]);
@@ -212,8 +288,15 @@
             const geom = feature.geometry;
 
             this.updateDjangoInput(geom);
-            this.fitToLine(geom);
+            // Do not auto-fit after edits by default. This prevents the map from snapping back
+            // to the geometry bounds after the user pans/zooms while editing.
+            if (this.mapOptions.fitBoundsOnEdit === true) {
+                this.fitToLine(geom);
+            }
             $(document).trigger(this.lineChangeTriggerNameSpace, [geom, this.wrapElemSelector, this.djangoInput]);
+
+            // Vertex drag/edit can temporarily disable map dragPan; ensure it is restored after update.
+            this.deferRestoreMapInteractionState();
         },
 
         handleDrawDelete: function (e) {
